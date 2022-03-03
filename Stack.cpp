@@ -1,5 +1,6 @@
 //  Adapated from Frank M. Carrano and Timothy M. Henry.
 
+
 /** ADT Stack implementation.
     @file Stack.cpp */
 
