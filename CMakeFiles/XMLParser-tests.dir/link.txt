@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/XMLParser-tests.dir/XMLParser.cpp.o CMakeFiles/XMLParser-tests.dir/XMLParser_test.cpp.o  -o XMLParser-tests 

@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/mainXMLParser.dir/XMLParser.cpp.o CMakeFiles/mainXMLParser.dir/mainXMLParser.cpp.o  -o mainXMLParser 

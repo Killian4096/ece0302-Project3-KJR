@@ -1,0 +1,7 @@
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/edit_cache.dir
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/test.dir
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/submission.dir
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/rebuild_cache.dir
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/mainXMLParser.dir
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/mainStack.dir
+/home/killian/ece0302-KR/ece0302-Project3-KJR/CMakeFiles/XMLParser-tests.dir

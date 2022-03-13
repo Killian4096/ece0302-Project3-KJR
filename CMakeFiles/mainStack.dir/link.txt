@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/mainStack.dir/mainStack.cpp.o  -o mainStack 
