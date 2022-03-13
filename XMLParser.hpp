@@ -28,8 +28,21 @@ private:
 	Stack<std::string>* parseStack;
 	/** Vector to store the tokenized input string and the token types */
 	std::vector<TokenStruct> tokenizedInputVector;
-	
+
+	//Used to indentity valid tag type	
 	TokenStruct *toTag(std::string xmlItem) const;
+
+	//Used to indentify is name if valid
+	bool checkNameChars(std::string tagName) const;
+
+	//Function to get name of tag
+	std::string getName(std::string tagContent) const;
+
+	//Function to create token
+	TokenStruct *genToken(StringTokenType tokenType, std::string tokenString) const;
+
+	bool tokenized;
+	bool parsed;
 
 public:
 	/** The class constructor.

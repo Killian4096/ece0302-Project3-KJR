@@ -10,6 +10,9 @@
 // TODO: Implement the constructor here
 XMLParser::XMLParser()
 {
+	tokenized=false;
+	parsed=false;
+	elementNameBag = new Bag<string>();
 }  // end default constructor
 
 // TODO: Implement the destructor here
@@ -20,6 +23,7 @@ XMLParser::~XMLParser()
 // TODO: Implement the tokenizeInputString method
 bool XMLParser::tokenizeInputString(const std::string &inputString)
 {
+	clear();
 	std::size_t s = 0;
 	std::size_t i = 0;
 	std::vector<std::string> xmlItems;
@@ -29,22 +33,26 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 	while(i<inputString.size()){
 
 		if(inputString[i]=='<'){
-			xmlItems.push_back(inputString.substr(s, s-i));
+			xmlItems.push_back(inputString.substr(s, i-s));
 			s = i;
 			i++;
 		}
 		else if(inputString[i]=='>'){
+			xmlItems.push_back(inputString.substr(s, i-s+1));
+			s = i+1;
 			i++;
-			xmlItems.push_back(inputString.substr(i, s-i));
-			s = i;
 		}
 		else{i++;}
 	}
-	xmlItems.push_back(inputString.substr(i, s-i));
+	xmlItems.push_back(inputString.substr(s, i-s));
 
 	//Clear null items
-	for(std::size_t i=0;i<xmlItems.size();i++){
-		if(xmlItems[i].size()==0){xmlItems.erase(xmlItems.begin()+i);i--;}
+	i=0;
+	while(i<xmlItems.size()){
+		if(xmlItems[i].size()==0){
+			xmlItems.erase(xmlItems.begin()+i);
+		}
+		else{i++;}
 	}
 
 	//Make tags and check if valid
@@ -60,7 +68,7 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 		tokenizedInputVector.push_back(*Token);
 		Token = nullptr;
 	}
-
+	tokenized=true;
 	return true;
 }  // end
 
@@ -68,18 +76,44 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 // or EMPTY_TAG string (you can change this...)
 static std::string deleteAttributes(std::string input)
 {
+	//END TAGS NO ATRIBUTES!!!!! FIX
 	return input;
 }
 
 // TODO: Implement the parseTokenizedInput method here
 bool XMLParser::parseTokenizedInput()
 {
-	return false;
+	if(!(tokenized)){return false;}
+	string pullString;
+	parseStack->clear();
+	for(std::size_t i=0;i<tokenizedInputVector.size();i++){
+		if(tokenizedInputVector[i].tokenType==START_TAG){
+			elementNameBag->add(tokenizedInputVector[i].tokenString);
+			parseStack->push(tokenizedInputVector[i].tokenString);
+		}
+		else if(tokenizedInputVector[i].tokenType==END_TAG){
+			pullString = parseStack->peek();
+			parseStack->pop();
+			if(pullString!=tokenizedInputVector[i].tokenString){
+				elementNameBag->clear();
+				parseStack->clear();
+				return false;
+			}
+		}
+	}
+	parseStack->clear();
+	parsed=true;
+	return true;
 }
 
 // TODO: Implement the clear method here
 void XMLParser::clear()
 {
+	tokenizedInputVector.clear();
+	parseStack->clear();
+	elementNameBag->clear();
+	tokenized=false;
+	parsed=false;
 }
 
 vector<TokenStruct> XMLParser::returnTokenizedInput() const
@@ -90,13 +124,13 @@ vector<TokenStruct> XMLParser::returnTokenizedInput() const
 // TODO: Implement the containsElementName method
 bool XMLParser::containsElementName(const std::string &inputString) const
 {
-	return false;
+	return elementNameBag->contains(inputString);
 }
 
 // TODO: Implement the frequencyElementName method
 int XMLParser::frequencyElementName(const std::string &inputString) const
 {
-	return -1;
+	return elementNameBag->getFrequencyOf(inputString);
 }
 
 TokenStruct *XMLParser::toTag(std::string xmlItem) const{
@@ -106,35 +140,35 @@ TokenStruct *XMLParser::toTag(std::string xmlItem) const{
 		//Check if between 2 <>
 		if(!(xmlItem[xmlItem.size()-1]=='>'||xmlItem.size()==2||(xmlItem.size()==3&&xmlItem[1]=='/'))){return nullptr;}
 
+		//Check declaraction
+		if(xmlItem[1]=='?'){
+			if(xmlItem[xmlItem.size()-2]=='?'){
+				string s = xmlItem.substr(2, xmlItem.size()-3);
+				return genToken(DECLARATION, s);
+			}
+			return nullptr;
+		}
+
 		StringTokenType TokenType;
+		string tagContent;
 		if(xmlItem[1]=='/'){
 			TokenType = END_TAG;
-			string tagContent = xmlItem.substr(2, xmlItem.size()-2);
-			
+			tagContent = xmlItem.substr(2, xmlItem.size()-3);
 		}else if(xmlItem[xmlItem.size()-2]=='/'){
 			TokenType = EMPTY_TAG;
-			string tagContent = xmlItem.substr(1, xmlItem.size()-3);
+			tagContent = xmlItem.substr(1, xmlItem.size()-3);
 		}else{
 			TokenType = START_TAG;
-			string tagContent = xmlItem.substr(1, xmlItem.size()-2);
+			tagContent = xmlItem.substr(1, xmlItem.size()-2);
 		}
 
+		string tagName = getName(tagContent);
 
-
-
-
-
-
-		string ILLEGAL_TAG_FIRST_CHAR = "-,.";
-		string ILLEGAL_TAG_CHAR = "!\"#$%&'()*+,/;<=>?@[\\]^`{|}~";
-
-
-
-
-
-		for(std::size_t compchar=0; compchar<ILLEGAL_TAG_FIRST_CHAR.size();compchar++){
-			//if(tagContent[])
+		if(!(checkNameChars(tagName))){
+			return nullptr;
 		}
+		return genToken(TokenType, tagName);
+
 
 
 	}
@@ -144,10 +178,7 @@ TokenStruct *XMLParser::toTag(std::string xmlItem) const{
 			if(xmlItem[i]=='<' || xmlItem[i]=='>'){return nullptr;}
 
 			//Generic return
-			TokenStruct *Token = new TokenStruct();
-			Token->tokenType = CONTENT;
-			Token->tokenString = xmlItem;
-			return Token;
+			return genToken(CONTENT, xmlItem);
 		}
 	}
 
@@ -155,4 +186,42 @@ TokenStruct *XMLParser::toTag(std::string xmlItem) const{
 
 
 	return nullptr;
+}
+
+
+bool XMLParser::checkNameChars(std::string tagName) const{
+	string ILLEGAL_TAG_FIRST_CHAR = "-,.";
+	string ILLEGAL_TAG_CHAR = "!\"#$%&'()*+,/;<=>?@[\\]^`{|}~";
+
+	//Check illegal first chars
+	for(std::size_t compchar=0; compchar<ILLEGAL_TAG_FIRST_CHAR.size();compchar++){
+		if(tagName[0]==ILLEGAL_TAG_CHAR[compchar]){
+			return false;
+		}
+	}
+
+	//Check illegal generic chars
+	for(std::size_t compchar=0; compchar<ILLEGAL_TAG_CHAR.size();compchar++){
+		for(std::size_t checkchar=0; checkchar<tagName.size();checkchar++){
+			if(tagName[checkchar]==ILLEGAL_TAG_CHAR[compchar]){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+std::string XMLParser::getName(std::string tagContent) const{
+	std::string tagName;
+	std::size_t i=0;
+	while(i<tagContent.size()&&tagContent[i]!=' '){i++;}
+	return tagContent.substr(0,i);
+}
+
+TokenStruct *XMLParser::genToken(StringTokenType tokenType, std::string tokenString) const{
+	TokenStruct *r = new TokenStruct;
+	r->tokenString = tokenString;
+	r->tokenType = tokenType;
+	return r;
 }

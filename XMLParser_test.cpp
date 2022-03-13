@@ -44,8 +44,17 @@ TEST_CASE( "Test Stack push", "[XMLParser]" )
 
 TEST_CASE( "Test XMLParser tokenizeInputString", "[XMLParser]" )
 {
-	   INFO("Hint: tokenize single element test of XMLParse");
+	   	INFO("Hint: tokenize single element test of XMLParse");
 		// Create an instance of XMLParse
+		XMLParser myXMLParser;
+		string testString = "<test>stuff</test>";
+		bool success;
+		success = myXMLParser.tokenizeInputString(testString);
+		REQUIRE(success);
+}
+
+TEST_CASE( "Test XMLParser tokenizeInputString2", "[XMLParser]" )
+{
 		XMLParser myXMLParser;
 		string testString = "<test>stuff</test>";
 		bool success;
