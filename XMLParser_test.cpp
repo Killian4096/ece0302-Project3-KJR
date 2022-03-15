@@ -51,14 +51,56 @@ TEST_CASE( "Test XMLParser tokenizeInputString", "[XMLParser]" )
 		bool success;
 		success = myXMLParser.tokenizeInputString(testString);
 		REQUIRE(success);
+		success = myXMLParser.parseTokenizedInput();
+		REQUIRE(success);
 }
 
 TEST_CASE( "Test XMLParser tokenizeInputString2", "[XMLParser]" )
 {
 		XMLParser myXMLParser;
-		string testString = "<test>stuff</test>";
+		string testString = "<test/>stuff</test>";
 		bool success;
 		success = myXMLParser.tokenizeInputString(testString);
 		REQUIRE(success);
+		success = myXMLParser.parseTokenizedInput();
+		REQUIRE(!success);
+}
+
+TEST_CASE( "Test XMLParser tokenizeInputString3", "[XMLParser]" )
+{
+		XMLParser myXMLParser;
+		string testString = "<test 398275oilr;hweljf lq;oiu;ouoqruhquel;>stuff</test>";
+		bool success;
+		success = myXMLParser.tokenizeInputString(testString);
+		REQUIRE(success);
+		success = myXMLParser.parseTokenizedInput();
+		REQUIRE(success);
+}
+
+TEST_CASE( "Test XMLParser tokenizeInputString4", "[XMLParser]" )
+{
+		XMLParser myXMLParser;
+		string testString = "<test 398275oilr;hweljf lq;oiu;ouoqruhquel;stuff</test>";
+		bool success;
+		success = myXMLParser.tokenizeInputString(testString);
+		REQUIRE(!success);
+}
+
+TEST_CASE( "Test XMLParser tokenizeInputString5", "[XMLParser]" )
+{
+		XMLParser myXMLParser;
+		string testString = "<?xml version=\"1.0\" ?><html></html>;";
+		bool success;
+		success = myXMLParser.tokenizeInputString(testString);
+		REQUIRE(success);
+}
+
+TEST_CASE( "Test XMLParser tokenizeInputString6", "[XMLParser]" )
+{
+		XMLParser myXMLParser;
+		string testString = "</>content</>";
+		bool success;
+		success = myXMLParser.tokenizeInputString(testString);
+		REQUIRE(!success);
 }
 

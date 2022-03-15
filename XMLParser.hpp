@@ -41,6 +41,8 @@ private:
 	//Function to create token
 	TokenStruct *genToken(StringTokenType tokenType, std::string tokenString) const;
 
+	void clearNull(std::vector<std::string> &xmlItems);
+
 	bool tokenized;
 	bool parsed;
 

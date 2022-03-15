@@ -13,6 +13,7 @@ XMLParser::XMLParser()
 	tokenized=false;
 	parsed=false;
 	elementNameBag = new Bag<string>();
+	parseStack = new Stack<string>();
 }  // end default constructor
 
 // TODO: Implement the destructor here
@@ -47,6 +48,8 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 	xmlItems.push_back(inputString.substr(s, i-s));
 
 	//Clear null items
+	clearNull(xmlItems);
+
 	i=0;
 	while(i<xmlItems.size()){
 		if(xmlItems[i].size()==0){
@@ -91,14 +94,22 @@ bool XMLParser::parseTokenizedInput()
 			elementNameBag->add(tokenizedInputVector[i].tokenString);
 			parseStack->push(tokenizedInputVector[i].tokenString);
 		}
+		else if(tokenizedInputVector[i].tokenType==EMPTY_TAG){
+			elementNameBag->add(tokenizedInputVector[i].tokenString);
+		}
 		else if(tokenizedInputVector[i].tokenType==END_TAG){
-			pullString = parseStack->peek();
-			parseStack->pop();
+			try{pullString = parseStack->peek();}
+			catch(...){
+				elementNameBag->clear();
+				parseStack->clear();
+				return false;
+			}
 			if(pullString!=tokenizedInputVector[i].tokenString){
 				elementNameBag->clear();
 				parseStack->clear();
 				return false;
 			}
+			parseStack->pop();
 		}
 	}
 	parseStack->clear();
@@ -136,9 +147,10 @@ int XMLParser::frequencyElementName(const std::string &inputString) const
 TokenStruct *XMLParser::toTag(std::string xmlItem) const{
 
 	StringTokenType TokenType;
+	cout << "Item: " << xmlItem << "\n";
 	if(xmlItem[0]=='<'){
 		//Check if between 2 <>
-		if(!(xmlItem[xmlItem.size()-1]=='>'||xmlItem.size()==2||(xmlItem.size()==3&&xmlItem[1]=='/'))){return nullptr;}
+		if(!(xmlItem[xmlItem.size()-1]=='>')||xmlItem.size()==2||(xmlItem.size()==3&&xmlItem[1]=='/')){return nullptr;}
 
 		//Check declaraction
 		if(xmlItem[1]=='?'){
@@ -224,4 +236,21 @@ TokenStruct *XMLParser::genToken(StringTokenType tokenType, std::string tokenStr
 	r->tokenString = tokenString;
 	r->tokenType = tokenType;
 	return r;
+}
+
+void XMLParser::clearNull(std::vector<std::string> &xmlItems){
+	for(std::size_t i=0;i<xmlItems.size()-1;i++){
+		for(std::size_t j=0;j<xmlItems[i].size();j++){
+			if(xmlItems[i].substr(j,2)=="\n"){
+				xmlItems[i][j]=' ';
+				xmlItems[i][j+1]=' ';
+			}
+		}
+		bool blank=true;
+		for(std::size_t j=0;j<xmlItems[i].size();j++){
+			if(xmlItems[i][j]!=' '){blank=false;}
+		}
+		if(blank){xmlItems[i]="";}
+	}
+
 }
