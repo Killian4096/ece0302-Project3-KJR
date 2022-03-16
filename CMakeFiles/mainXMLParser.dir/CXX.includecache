@@ -64,3 +64,13 @@ Bag.hpp
 Stack.hpp
 /home/killian/ece0302-KR/ece0302-Project3-KJR/Stack.hpp
 
+/home/killian/ece0302-KR/ece0302-Project3-KJR/mainXMLParser.cpp
+iostream
+-
+fstream
+-
+string
+-
+XMLParser.hpp
+/home/killian/ece0302-KR/ece0302-Project3-KJR/XMLParser.hpp
+

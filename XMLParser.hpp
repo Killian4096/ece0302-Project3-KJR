@@ -10,6 +10,8 @@
 #include "Bag.hpp"
 #include "Stack.hpp"
 
+//Github: https://github.com/Killian4096/ece0302-Project3-KJR
+
 /** enum definition for possible string token types. */
 typedef enum {START_TAG=1, END_TAG, EMPTY_TAG, CONTENT, DECLARATION} StringTokenType;
 

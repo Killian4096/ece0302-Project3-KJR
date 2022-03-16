@@ -7,6 +7,8 @@
 #include <assert.h>
 #include "XMLParser.hpp"
 
+//Github: https://github.com/Killian4096/ece0302-Project3-KJR
+
 // TODO: Implement the constructor here
 XMLParser::XMLParser()
 {
@@ -112,6 +114,11 @@ bool XMLParser::parseTokenizedInput()
 			parseStack->pop();
 		}
 	}
+	if(parseStack->size()!=0){
+		elementNameBag->clear();
+		parseStack->clear();
+		return false;
+	}
 	parseStack->clear();
 	parsed=true;
 	return true;
@@ -147,7 +154,7 @@ int XMLParser::frequencyElementName(const std::string &inputString) const
 TokenStruct *XMLParser::toTag(std::string xmlItem) const{
 
 	StringTokenType TokenType;
-	cout << "Item: " << xmlItem << "\n";
+	//cout << "Item: " << xmlItem << "\n";
 	if(xmlItem[0]=='<'){
 		//Check if between 2 <>
 		if(!(xmlItem[xmlItem.size()-1]=='>')||xmlItem.size()==2||(xmlItem.size()==3&&xmlItem[1]=='/')){return nullptr;}
@@ -155,7 +162,7 @@ TokenStruct *XMLParser::toTag(std::string xmlItem) const{
 		//Check declaraction
 		if(xmlItem[1]=='?'){
 			if(xmlItem[xmlItem.size()-2]=='?'){
-				string s = xmlItem.substr(2, xmlItem.size()-3);
+				string s = xmlItem.substr(2, xmlItem.size()-4);
 				return genToken(DECLARATION, s);
 			}
 			return nullptr;
@@ -239,11 +246,10 @@ TokenStruct *XMLParser::genToken(StringTokenType tokenType, std::string tokenStr
 }
 
 void XMLParser::clearNull(std::vector<std::string> &xmlItems){
-	for(std::size_t i=0;i<xmlItems.size()-1;i++){
+	for(std::size_t i=0;i<xmlItems.size();i++){
 		for(std::size_t j=0;j<xmlItems[i].size();j++){
-			if(xmlItems[i].substr(j,2)=="\n"){
+			if(xmlItems[i][j]=='\n'){
 				xmlItems[i][j]=' ';
-				xmlItems[i][j+1]=' ';
 			}
 		}
 		bool blank=true;

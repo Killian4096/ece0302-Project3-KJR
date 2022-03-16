@@ -73,5 +73,8 @@ bool Stack<ItemType>::pop()
 template<class ItemType>
 void Stack<ItemType>::clear()
 {
+	while(currentSize!=0){
+		pop();
+	}
 }  // end clear
 
